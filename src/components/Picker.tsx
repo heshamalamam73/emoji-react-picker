@@ -5,14 +5,16 @@ import emojisDb, { Emoji } from "./emojisDb";
 type Props = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onSelectEmoji: (emoji: string) => void;
   //
 };
 
 const Picker = forwardRef<HTMLDivElement, Props>(
-  ({ open, setOpen, ...props }, ref) => {
+  ({ open, setOpen, onSelectEmoji, ...props }, ref) => {
     const [openPicker, setOpenPicker] = useState<boolean>(false);
     const [searchValue, setSearchValue] = useState<string>("");
     const [filterdEmojis, setFilterEmojis] = useState<Emoji[]>([]);
+    const pickerRef = React.createRef();
     const getFilterdEmoji = useCallback(
       (emojis: Emoji[], value: string) => {
         if (value === "") setFilterEmojis(emojis);
@@ -24,15 +26,19 @@ const Picker = forwardRef<HTMLDivElement, Props>(
       },
       [searchValue]
     );
+
     useEffect(() => {
       getFilterdEmoji(emojisDb, searchValue);
     }, [searchValue, getFilterdEmoji]);
     const handleSearchEmoji = (e: any) => {
       setSearchValue(e.target.value);
     };
+    const handleSelectEmoji = (emoji: string) => () => {
+      if (emoji) onSelectEmoji(emoji);
+    };
     return open ? (
       <div
-        ref={ref}
+        ref={pickerRef}
         style={{
           width: 250,
           height: 300,
@@ -49,11 +55,12 @@ const Picker = forwardRef<HTMLDivElement, Props>(
             position: "relative",
             display: "flex",
             flexDirection: "column",
-            flex: 1,
-            overflow: "auto"
+            overflow: "auto",
+            height: "100%"
           }}
         >
           <input
+            value={searchValue}
             autoFocus
             onChange={handleSearchEmoji}
             placeholder="search emoji"
@@ -68,19 +75,27 @@ const Picker = forwardRef<HTMLDivElement, Props>(
           />
           <div
             style={{
-              paddingTop: 10,
-              margin: "auto",
-              overflow: "scroll",
+              height: "100%",
+              // margin: "auto",
+              overflow: "auto",
               display: "flex",
               flexWrap: "wrap",
               maxWidth: "100%",
               maxHeight: "100%",
-              justifyContent: "center",
-              flex: 1
+              justifyContent: "flex-start",
+              alignItems: "flex-start",
+              alignContent: "flex-start"
             }}
           >
             {filterdEmojis?.map((emoji) => {
-              return <span style={{ paddingRight: 5 }}>{emoji.emoji}</span>;
+              return (
+                <span
+                  onClick={handleSelectEmoji(emoji.emoji)}
+                  style={{ padding: 3 }}
+                >
+                  {emoji.emoji}
+                </span>
+              );
             })}
           </div>
         </div>

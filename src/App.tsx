@@ -4,6 +4,7 @@ import Picker from "./components/Picker";
 import React from "react";
 export default function App() {
   const [emojiModel, setEmojiModel] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>("");
   const inputContainer = {
     border: "1px solid #eee",
     justifyContent: "space-between",
@@ -30,20 +31,37 @@ export default function App() {
   }, [setEmojiModel]);
 
   const pickerRef = React.createRef<HTMLDivElement>();
-
+  const handleSelectEmoji = (emogi: string) => {
+    setInputValue((prev) => prev.concat(emogi));
+  };
+  const handleChangeInputValue = (e: any) => {
+    setInputValue(e.target.value);
+  };
   return (
     <div className="App">
       <h1>React Emoji Picker </h1>
       <h2>just react js without any libraries </h2>
+      <p>{inputValue}</p>
       <div style={inputContainer}>
-        <input placeholder="placeholder" type="text" style={inputStyle} />
+        <input
+          value={inputValue}
+          onChange={handleChangeInputValue}
+          placeholder="placeholder"
+          type="text"
+          style={inputStyle}
+        />
         <button onClick={handleToggleEmojiBox} style={emojiButton}>
           <span role="img" aria-label="emogi">
             😀
           </span>
         </button>
       </div>
-      <Picker ref={pickerRef} open={emojiModel} setOpen={setEmojiModel} />
+      <Picker
+        onSelectEmoji={handleSelectEmoji}
+        ref={pickerRef}
+        open={emojiModel}
+        setOpen={setEmojiModel}
+      />
     </div>
   );
 }
